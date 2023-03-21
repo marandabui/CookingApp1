@@ -1,5 +1,7 @@
 package com.example.cookingapp.Models;
 
+import java.util.ArrayList;
+
 public class Equipment {
     public int id;
     public String name;
