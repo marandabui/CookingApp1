@@ -33,8 +33,10 @@ class OverviewActivity : AppCompatActivity() {
     //lateinit var appliancesAdapter: AppliancesAdapter
 
     private lateinit var ingredientListView : ListView
+    val ingredients: MutableList<String> = ArrayList()
+
+
     private var arrayAdapter: ArrayAdapter<String> ?=null
-    //private var ingredients = mutableListOf<String>("lorem ipsum","dolor sit amet")
     private lateinit var btnOverview : ImageButton
     private lateinit var btnOverviewBack : ImageButton
     private lateinit var btnHeart : ImageButton
@@ -60,27 +62,11 @@ class OverviewActivity : AppCompatActivity() {
         btnHeart = findViewById(R.id.btnHeart)
         btnIngredientsPlus = findViewById(R.id.btnIngredientsPlus)
         btnIngredientsMinus = findViewById(R.id.btnIngredientsMinus)
-        /*servings = findViewById<TextView>(R.id.tvServings)
-        time = findViewById<TextView>(R.id.tvTime)
-        numIng = findViewById<TextView>(R.id.tvIngredients)
-
-
-        ingredientListView = findViewById(R.id.lvIngredients)
-        arrayAdapter = ArrayAdapter(this, R.layout.ingredient_item,R.id.tvIngredient ,ingredients)
-        ingredientListView.adapter = arrayAdapter*/
-
-        //when api response received, add ingredients like this
-        /*ingredients.add("Consectetur adipiscing elit")
-        ingredients.add("In vestibulum")*/
 
         //if api response contains appliances, edit text like this
         /*appliance1.text = "Oven"
         appliance2.text = "Rice cooker"*/
 
-        //when api response received, update serving, time, and num of ingredients like this
-        /*servings.text = "1"
-        time.text = "2 min"
-        numIng.text = "4"*/
 
         btnOverview.setOnClickListener{
             val intent = Intent(this,PrepActivity::class.java)
@@ -119,7 +105,8 @@ class OverviewActivity : AppCompatActivity() {
         tvTime = findViewById(R.id.tvTime)
         tvServings = findViewById(R.id.tvServings)
         tvIngredientCount = findViewById(R.id.tvIngredientCount)
-        recycler_recipe_ingredients = findViewById(R.id.recycler_recipe_ingredients)
+        ingredientListView = findViewById(R.id.lvingredients)
+        //recycler_recipe_ingredients = findViewById(R.id.recycler_recipe_ingredients)
         //recycler_recipe_appliances = findViewById(R.id.recycler_recipe_appliances)
     }
 
@@ -132,11 +119,17 @@ class OverviewActivity : AppCompatActivity() {
                 tvServings.text = response.servings.toString()
                 tvIngredientCount.text = response.extendedIngredients.size.toString()
 
+                ingredients.clear()
+                for (i in 0 until response.extendedIngredients.size) {
+                    ingredients.add(response.extendedIngredients[i].name)
+                }
+
+                arrayAdapter = ArrayAdapter(this@OverviewActivity, R.layout.ingredient_item,R.id.tvIngredient ,ingredients)
+                ingredientListView.adapter = arrayAdapter
                 //recycler_recipe_appliances.setHasFixedSize(true)
                 //recycler_recipe_appliances.layoutManager = LinearLayoutManager(this@OverviewActivity, LinearLayoutManager.HORIZONTAL, false)
                 //appliancesAdapter = AppliancesAdapter(this@OverviewActivity, response.extendedIngredients)
                 //recycler_recipe_appliances.adapter = appliancesAdapter
-
 
             }
             else {
