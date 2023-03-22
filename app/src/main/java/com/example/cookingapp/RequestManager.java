@@ -2,9 +2,11 @@ package com.example.cookingapp;
 
 import android.content.Context;
 
+import com.example.cookingapp.Listeners.AppliancesListener;
 import com.example.cookingapp.Listeners.RandomRecipeResponseListener;
 import com.example.cookingapp.Listeners.RecipeDetailsListener;
 import com.example.cookingapp.Models.RandomRecipesApiResponse;
+import com.example.cookingapp.Models.RecipeAppliancesResponse;
 import com.example.cookingapp.Models.RecipeDetailsResponse;
 
 import java.util.List;
@@ -92,6 +94,26 @@ public class RequestManager {
         });
     }
 
+    public void getRecipeAppliances(AppliancesListener listener, int id){
+        CallRecipeAppliances callRecipeAppliances = retrofit.create(CallRecipeAppliances.class);
+        Call<RecipeAppliancesResponse> call = callRecipeAppliances.callRecipeAppliancess(id, context.getString(R.string.api_key));
+        call.enqueue(new Callback<RecipeAppliancesResponse>() {
+            @Override
+            public void onResponse(Call<RecipeAppliancesResponse> call, Response<RecipeAppliancesResponse> response) {
+                if (!response.isSuccessful()) {
+                    listener.didError(response.message());
+                    return;
+                }
+                listener.didFetch(response.body(), response.message());
+            }
+
+            @Override
+            public void onFailure(Call<RecipeAppliancesResponse> call, Throwable t) {
+                listener.didError(t.getMessage());
+            }
+        });
+    }
+
     private interface CallRandomRecipes{
         @GET("recipes/random")
         Call<RandomRecipesApiResponse> callRandomRecipe (
@@ -110,6 +132,14 @@ public class RequestManager {
     private interface CallRecipeDetails{
         @GET("recipes/{id}/information")
         Call<RecipeDetailsResponse> callRecipeDetails(
+                @Path("id") int id,
+                @Query("apiKey") String apiKey
+        );
+    }
+
+    private interface CallRecipeAppliances{
+        @GET("recipes/{id}/equipmentWidget")
+        Call<RecipeAppliancesResponse> callRecipeAppliancess(
                 @Path("id") int id,
                 @Query("apiKey") String apiKey
         );

@@ -10,7 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.cookingapp.Models.Equipment;
+import com.example.cookingapp.Models.Appliance;
 import com.example.cookingapp.R;
 import com.squareup.picasso.Picasso;
 
@@ -18,9 +18,9 @@ import java.util.List;
 
 public class AppliancesAdapter extends RecyclerView.Adapter<AppliancesViewHolder>{
     Context context;
-    List<Equipment> list;
+    List<Appliance> list;
 
-    public AppliancesAdapter(Context context, List<Equipment> list) {
+    public AppliancesAdapter(Context context, List<Appliance> list) {
         this.context = context;
         this.list = list;
     }

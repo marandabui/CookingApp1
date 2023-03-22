@@ -16,7 +16,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blogspot.atifsoftwares.animatoolib.Animatoo
 import com.example.cookingapp.Adapters.AppliancesAdapter
+import com.example.cookingapp.Listeners.AppliancesListener
 import com.example.cookingapp.Listeners.RecipeDetailsListener
+import com.example.cookingapp.Models.Appliance
+import com.example.cookingapp.Models.RecipeAppliancesResponse
 import com.example.cookingapp.Models.RecipeDetailsResponse
 import org.w3c.dom.Text
 
@@ -27,10 +30,9 @@ class OverviewActivity : AppCompatActivity() {
     lateinit var tvTime : TextView
     lateinit var tvServings : TextView
     lateinit var tvIngredientCount : TextView
-    lateinit var recycler_recipe_ingredients : RecyclerView
-   // lateinit var recycler_recipe_appliances: RecyclerView
+    lateinit var recycler_recipe_appliances: RecyclerView
     lateinit var manager : RequestManager
-    //lateinit var appliancesAdapter: AppliancesAdapter
+    lateinit var appliancesAdapter: AppliancesAdapter
 
     private lateinit var ingredientListView : ListView
     val ingredients: MutableList<String> = ArrayList()
@@ -47,6 +49,7 @@ class OverviewActivity : AppCompatActivity() {
     private lateinit var numIng : TextView
     private var servingsCounter : Int = 0
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.Light)
@@ -56,6 +59,7 @@ class OverviewActivity : AppCompatActivity() {
         id = getIntent().getStringExtra("id")?.toIntOrNull() ?: 0
         manager = RequestManager(this)
         manager.getRecipeDetails(recipeDetailsListener, id)
+        manager.getRecipeAppliances(appliancesListener, id)
 
         btnOverview = findViewById(R.id.btnOverview)
         btnOverviewBack = findViewById(R.id.btnOverviewBack)
@@ -88,13 +92,11 @@ class OverviewActivity : AppCompatActivity() {
 
         //increment servings
         btnIngredientsPlus.setOnClickListener{
-            servingsCounter += 1
-            servings.text= servingsCounter.toString()
+            tvServings.text = (Integer.parseInt(tvServings.text.toString()) + 1).toString()
         }
         btnIngredientsMinus.setOnClickListener{
-            if (servingsCounter > 0) {
-                servingsCounter -= 1
-                servings.text = servingsCounter.toString()
+            if (Integer.parseInt(tvServings.text.toString()) > 0) {
+                tvServings.text = (Integer.parseInt(tvServings.text.toString()) - 1).toString()
             }
         }
     }
@@ -107,7 +109,7 @@ class OverviewActivity : AppCompatActivity() {
         tvIngredientCount = findViewById(R.id.tvIngredientCount)
         ingredientListView = findViewById(R.id.lvingredients)
         //recycler_recipe_ingredients = findViewById(R.id.recycler_recipe_ingredients)
-        //recycler_recipe_appliances = findViewById(R.id.recycler_recipe_appliances)
+        recycler_recipe_appliances = findViewById(R.id.recycler_recipe_appliances)
     }
 
     private val recipeDetailsListener = object : RecipeDetailsListener {
@@ -126,10 +128,6 @@ class OverviewActivity : AppCompatActivity() {
 
                 arrayAdapter = ArrayAdapter(this@OverviewActivity, R.layout.ingredient_item,R.id.tvIngredient ,ingredients)
                 ingredientListView.adapter = arrayAdapter
-                //recycler_recipe_appliances.setHasFixedSize(true)
-                //recycler_recipe_appliances.layoutManager = LinearLayoutManager(this@OverviewActivity, LinearLayoutManager.HORIZONTAL, false)
-                //appliancesAdapter = AppliancesAdapter(this@OverviewActivity, response.extendedIngredients)
-                //recycler_recipe_appliances.adapter = appliancesAdapter
 
             }
             else {
@@ -138,6 +136,27 @@ class OverviewActivity : AppCompatActivity() {
                 tvTime.text = ""
                 tvServings.text = ""
                 tvIngredientCount.text = ""
+            }
+        }
+
+        override fun didError(message: String?) {
+            Toast.makeText(this@OverviewActivity, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private val appliancesListener = object : AppliancesListener {
+        override fun didFetch(response: RecipeAppliancesResponse?, message: String?) {
+            if (response != null) {
+                arrayAdapter = ArrayAdapter(this@OverviewActivity, R.layout.ingredient_item,R.id.tvIngredient ,ingredients)
+                ingredientListView.adapter = arrayAdapter
+                recycler_recipe_appliances.setHasFixedSize(true)
+                recycler_recipe_appliances.layoutManager = LinearLayoutManager(this@OverviewActivity, LinearLayoutManager.HORIZONTAL, false)
+                appliancesAdapter = AppliancesAdapter(this@OverviewActivity, response.equipment)
+                recycler_recipe_appliances.adapter = appliancesAdapter
+
+            }
+            else {
+
             }
         }
 
